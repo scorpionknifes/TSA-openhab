@@ -1,0 +1,11 @@
+sitemap demo label="My home automation" {
+	Frame label="TSA" {
+	Switch item=Light_1 icon="light"
+	Default item=Door_1 icon="door"
+	Text item=Motion_1 label="Motion 1:%s]"
+	Text item=Motion_1_battery label="Battery status [%d]"
+	Switch item=Motion_1_alarm icon="light"
+	Default item=Door_Sensor_1 icon="door"
+	}
+}
+

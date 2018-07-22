@@ -1,0 +1,10 @@
+
+//Light
+Switch Light_1 "Light 1" <light> [ "Lighting" ] {channel="zwave:device:467c93f4:node5:switch_binary" }
+
+//Sensors
+Contact Door_1 "Door 1[%s]" <door> {channel="zwave:device:467c93f4:node5:switch_binary" }
+Contact Motion_1 "Motion 1 [%s]" <door> {channel="zwave:device:467c93f4:node8:sensor_binary" }
+Number Motion_1_battery "Battery status [%d]" (Group_Netatmo,Group_Battery) {channel="zwave:device:467c93f4:node8:battery-level"}
+Switch Motion_1_alarm "Alarm" {channel="zwave:device:467c93f4:node8:alarm_burglar" }
+Contact Door_Sensor_1 "DoorSensor [%s]" {channel="zwave:device:467c93f4:node14:sensor_door"}

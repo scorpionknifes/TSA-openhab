@@ -1,0 +1,28 @@
+
+
+var Timer timer = null
+
+rule "Motion Light"
+when
+    Item Motion_1_alarm received update ON
+then
+    sendCommand(Light_1, ON)
+	sendCommand(Motion_1_alarm, OFF)
+	timer = createTimer(now.plusSeconds(10)) [|
+        sendCommand(Light_1, OFF)
+        timer = null   // reset the timer
+    ]
+end
+	
+rule "Door Light"
+when
+    Item Door_Sensor_1 received update OPEN
+then
+    sendCommand(Light_1, ON)
+	sendCommand(Motion_1_alarm, OFF)
+	timer = createTimer(now.plusSeconds(10)) [|
+        sendCommand(Light_1, OFF)
+        timer = null   // reset the timer
+    ]
+end
+	
