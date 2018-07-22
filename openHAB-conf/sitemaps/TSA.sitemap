@@ -1,11 +1,23 @@
-sitemap demo label="My home automation" {
-	Frame label="TSA" {
-	Switch item=Light_1 icon="light"
-	Default item=Door_1 icon="door"
-	Text item=Motion_1 label="Motion 1:%s]"
-	Text item=Motion_1_battery label="Battery status [%d]"
-	Switch item=Motion_1_alarm icon="light"
-	Default item=Door_Sensor_1 icon="door"
+///////////////////////////////////////////////////////////////////////
+//                               Sitemaps
+///////////////////////////////////////////////////////////////////////
+
+
+
+sitemap TSA label="TSA's home automation" {
+	
+	Frame label="Switch" {
+	Switch item=Light_1 icon="light"				//Switch
+	}
+	
+	Frame label="Sensor" {
+	Default item=Motion_1_alarm icon="motion"		//switches on with motion is detected
+	Default item=Door_Sensor_1 icon="door"			//shows OPEN or Closed*
+	}
+	
+	Frame label="Battery" {
+	Text item=Motion_1_battery label="Motion 1 [%d]"		//gives reading in 100
+	Text item=Door_Sensor_1_battery label="Door Sensor 1 [%d]"
 	}
 }
 

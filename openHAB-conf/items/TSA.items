@@ -1,10 +1,33 @@
+///////////////////////////////////////////////////////////////////////
+//                               Items
+///////////////////////////////////////////////////////////////////////
 
-//Light
+
+///////////////////////////////////////////////////////////////////////
+//                               Light
+///////////////////////////////////////////////////////////////////////
+
+//Light wall switch PAN03
 Switch Light_1 "Light 1" <light> [ "Lighting" ] {channel="zwave:device:467c93f4:node5:switch_binary" }
+Number Light_1_watt "Light 1 watt" <power> {channel="zwave:device:467c93f4:node5:meter_watts"}
 
-//Sensors
-Contact Door_1 "Door 1[%s]" <door> {channel="zwave:device:467c93f4:node5:switch_binary" }
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+//                               Sensors
+///////////////////////////////////////////////////////////////////////
+
+//Motion sensor PSP05
 Contact Motion_1 "Motion 1 [%s]" <door> {channel="zwave:device:467c93f4:node8:sensor_binary" }
-Number Motion_1_battery "Battery status [%d]" (Group_Netatmo,Group_Battery) {channel="zwave:device:467c93f4:node8:battery-level"}
-Switch Motion_1_alarm "Alarm" {channel="zwave:device:467c93f4:node8:alarm_burglar" }
-Contact Door_Sensor_1 "DoorSensor [%s]" {channel="zwave:device:467c93f4:node14:sensor_door"}
+Number Motion_1_battery " Motion 1 [%d]" <battery> (Group_Netatmo,Group_Battery) {channel="zwave:device:467c93f4:node8:battery-level"}
+Switch Motion_1_alarm "Motion 1 " {channel="zwave:device:467c93f4:node8:alarm_burglar" }
+
+//Door/Window Sensor Door/Window Sensor
+Contact Door_1 "Door 1[%s]" <door> {channel="zwave:device:467c93f4:node14:sensor_door" }
+Contact Door_Sensor_1 "Door Sensor 1 [%s]" <door> {channel="zwave:device:467c93f4:node14:sensor_door"}
+Number Door_Sensor_1_battery "Door Sensor 1 [%s]" <battery> {channel="zwave:device:467c93f4:node14:battery-level"}
