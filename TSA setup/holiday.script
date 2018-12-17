@@ -1,0 +1,125 @@
+///////////////////////////////////////////////////////////////////////
+//                 Holiday by https://community.openhab.org/t/new-zealand-public-holidays-script/8998
+///////////////////////////////////////////////////////////////////////
+
+var int year = now.getYear
+
+var int a = year % 19
+var int b = year / 100
+var int c = year % 100
+var int d = b / 4;
+var int e = b % 4;
+var int f = (b + 8) / 25;
+var int g = (b - f + 1) / 3;
+var int h = (19 * a + b - d - g + 15) % 30;
+var int i = c / 4;
+var int k = c % 4;
+var int L = (32 + 2 * e + 2 * i - h - k) % 7;
+var int m = (a + 11 * h + 22 * L) / 451;
+
+var int month = (h + L - 7 * m + 114) / 31;
+var int day = ((h + L - 7 * m + 114) % 31) + 1;
+
+var boolean holiday = false
+var String holidayName = null
+var org.joda.time.DateTime easterSunday = parse(year+"-"+month+"-"+day)
+var dayOfWeek = now.getDayOfWeek
+
+
+var org.joda.time.DateTime newYears = parse(year+"-01-01")
+if(newYears.getDayOfWeek == 0 || newYears.getDayOfWeek == 6)
+	newYears= parse(year+"-01-03")	
+var org.joda.time.DateTime newYears2 = parse(year+"-01-02")
+if(newYears2.getDayOfWeek == 0 || newYears2.getDayOfWeek == 6) // saturday, we add 2 days, sunday we also add 2 days, since 1st is pushed to monday
+	newYears2= parse(year+"-01-04")
+
+var org.joda.time.DateTime waitangiDay= parse(year+"-02-06")
+if(waitangiDay.getDayOfWeek == 0)
+	waitangiDay= parse(year+"-02-07")
+else if(waitangiDay.getDayOfWeek == 6)
+	waitangiDay= parse(year+"-02-09")
+	
+var org.joda.time.DateTime anzacDay= parse(year+"-04-25")
+if(anzacDay.getDayOfWeek == 0)
+	anzacDay= parse(year+"-04-27")
+else if(anzacDay.getDayOfWeek == 6)
+	anzacDay= parse(year+"-04-27")
+	
+// queens birthday, first monday in june
+var org.joda.time.DateTime queensBirthday = parse(year+"-06-01")
+if(queensBirthday.getDayOfWeek == 0)
+	queensBirthday= parse(year+"-06-02")
+else if(queensBirthday.getDayOfWeek !== 1){
+	queensBirthday= parse(year+"-06-0"+ (8 - queensBirthday.getDayOfWeek))	
+}
+// labour day, 4th Monday in October...
+var org.joda.time.DateTime octoberOne = parse(year+"-10-01")
+var org.joda.time.DateTime labourDay = octoberOne.withDayOfWeek(1)
+if(labourDay.isBefore(octoberOne))
+	labourDay = labourDay.plusWeeks(4)
+else 
+	labourDay = labourDay.plusWeeks(3)
+	
+var org.joda.time.DateTime xmasDay = parse(year+"-12-25")
+if(xmasDay.getDayOfWeek == 0 || xmasDay.getDayOfWeek == 6)
+	xmasDay= parse(year+"-12-27")	
+var org.joda.time.DateTime boxingDay = parse(year+"-12-26")
+if(boxingDay.getDayOfWeek == 0 || boxingDay.getDayOfWeek == 6) // saturday, we add 2 days, sunday we also add 2 days, since xmasd day is pushed to monday
+	boxingDay= parse(year+"-12-28")
+	
+	
+var int dayOfYear = now.getDayOfYear
+if (dayOfYear==newYears.getDayOfYear) {
+    holidayName = "new_years_day" // New Year
+    holiday = true
+}
+else if (dayOfYear==newYears2.getDayOfYear) {
+    holidayName = "day_after_new_years"
+    holiday = true 
+}
+else if (dayOfYear==easterSunday.getDayOfYear-2) {
+    holidayName = "good_friday"
+    holiday = true
+}
+else if (dayOfYear==easterSunday.getDayOfYear) {
+    holidayName = "easter_sunday"
+    holiday = true
+}
+else if (dayOfYear==easterSunday.getDayOfYear+1) {
+    holidayName = "easter_monday"
+    holiday = true
+}
+else if (dayOfWeek == 1 && Math::abs(dayOfYear - parse(year+"-01-29").getDayOfYear) <= 4) {
+    holidayName = "auckland_anniversay_day"
+    holiday = true 
+}
+else if (dayOfYear==waitangiDay.getDayOfYear) {
+    holidayName = "waitangi_day" 
+    holiday = true
+}
+else if (dayOfYear==queensBirthday.getDayOfYear) {
+    holidayName = "queens_birthday" 
+    holiday = true
+}
+else if (dayOfYear==labourDay.getDayOfYear) {
+    holidayName = "labour_day" 
+    holiday = true
+}
+else if (dayOfYear==xmasDay.getDayOfYear) {
+    holidayName = "christmas" // New Year
+    holiday = true
+}
+else if (dayOfYear==boxingDay.getDayOfYear) {
+    holidayName = "boxing_day"
+    holiday = true 
+}
+
+if (holidayName!==null) {
+    postUpdate(SpecialDay,holidayName)
+}
+if (holiday) {
+    postUpdate(Holiday,ON)			//Holiday ON
+}
+else {
+    postUpdate(Holiday,OFF)			//Holiday OFF
+}

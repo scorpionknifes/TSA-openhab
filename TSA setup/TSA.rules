@@ -1,0 +1,253 @@
+///////////////////////////////////////////////////////////////////////
+//                               Rules
+///////////////////////////////////////////////////////////////////////
+//Libraries (not really necessary)
+import org.openhab.core.library.types.*
+import org.openhab.model.script.actions.*
+
+
+//Timers
+var Timer timer = null		//Timer for motion
+var Timer timer1 = null		//Timer for business hours
+var Timer timer3 = null		//Timer for workbench
+
+var Timer myTimer = null    //Variables for GUI timer
+var Timer myTimer1 = null
+
+var Integer timeout = 30	//30 min Timer for motion
+var Integer timeout1 = 20	//20 min Timer for business hours
+
+var Number day = now.getDayOfWeek	//current day
+
+rule "Start"		//Openhab Boot 
+when
+    System started
+then
+    logInfo("System", "System Started")
+    callScript("holiday")
+    sendCommand(Motion_1_alarm, OFF)	//Turn off alarm if already on
+    sendCommand(Motion_2_alarm, OFF)
+    sendCommand(wx, OFF)				//Turn off lights
+    sendCommand(w0x, OFF)
+end
+
+rule "motion"		//Any motion from motion sensor
+when
+    Item Motion_1_alarm changed from OFF to ON or Item Motion_2_alarm changed from OFF to ON
+then
+  logInfo("Lights","motion detected")
+
+	if (timer !== null)	
+	{
+		timer.reschedule(now.plusMinutes(timeout))
+		logInfo("Lights","timer rescheduled for " + timeout + " minutes")
+		postUpdate(test_integer,0)			//Reset Countdown
+		sendCommand(wx, ON)
+  }
+  else
+  {
+
+    sendCommand(wx, ON)
+		timer = createTimer(now.plusMinutes(timeout))
+		[|
+			logInfo("Lights","light timer expired")
+			sendCommand(wx, OFF)
+      postUpdate(test_integer,0)
+			timer = null
+		]
+    }
+	if (Motion_1_alarm.state == ON){
+		postUpdate(test_integer,2)		//GUI timer countdown
+	}
+	if (Motion_2_alarm.state == ON){
+		postUpdate(test_integer,3)		//GUI timer countdown	
+	}
+	 
+	
+	if (officetime.state == ON){
+		if (timer1 !== null)
+		{
+			timer1.reschedule(now.plusMinutes(timeout1))
+			postUpdate(test_integer1,0)			//Reset Countdown
+			sendCommand(w0x, ON)
+		}
+		else
+		{
+			sendCommand(w0x, ON)
+			timer1 = createTimer(now.plusMinutes(timeout1))
+			[|
+				logInfo("Lights","light timer expired")
+				sendCommand(w0x, OFF)
+				postUpdate(test_integer1,0)
+				timer1 = null
+			]
+			logInfo("Lights","timer created for " + timeout + " minutes")
+		}
+		if (Motion_1_alarm.state == ON){
+			postUpdate(test_integer1,2)
+		}
+		if (Motion_2_alarm.state == ON){
+			postUpdate(test_intege1,3)
+		}
+	}
+	sendCommand(Motion_1_alarm, OFF)
+	sendCommand(Motion_2_alarm, OFF)
+end
+
+//Workbench
+rule "Work Bench"
+when
+    Item Motion_work_bench_alarm changed from OFF to ON
+then
+	if(timer3 === null)
+    {
+		sendCommand(workbench, ON)
+		timer3 = createTimer(now.plusMinutes(1)) [|
+			sendCommand(workbench, OFF)
+			timer3 = null   // reset the timer
+			logInfo("Lights","workbench off")
+		]
+	}
+    else
+    {
+        timer3.reschedule(now.plusSeconds(1))
+    }
+	sendCommand(Motion_work_bench_alarm,OFF)
+end
+
+///Light Control
+
+rule "w1 w2 w3"		//Main Lights
+when
+	Item wx changed
+then
+	if (wx.state == ON)
+	{
+		sendCommand(w1, ON)
+		sendCommand(w2, ON)
+		sendCommand(w3, ON)
+	}
+	else
+	{
+		sendCommand(w1, OFF)
+		sendCommand(w2, OFF)
+		sendCommand(w3, OFF)
+	}
+end
+
+rule "w01 w02 w03 w04 w05"		//Office time Lights
+when
+	Item w0x changed
+then
+	if (w0x.state == ON)
+	{
+		sendCommand(w01, ON)
+		sendCommand(w02, ON)
+		sendCommand(w03, ON)
+		sendCommand(w05, ON)
+	}
+	else
+	{
+		sendCommand(w01, OFF)
+		sendCommand(w02, OFF)
+		sendCommand(w03, OFF)
+		sendCommand(w05, OFF)
+	}
+end
+
+rule "officetimetest"		//Check if current time is office time
+when
+		Time cron "0 0 9 1/1 * ? *" or Time cron "0 0 17 1/1 * ? *" or System started			//Start at times and system start
+then
+  callScript("holiday")
+	day = now.getDayOfWeek
+	logInfo("Lights","day is " +day)
+  var test = "OFF"
+	if ((day == 1) || (day == 2) || (day == 3) || (day == 4) || (day == 5)){
+		if (Holiday.state == OFF){
+			if((new LocalTime().getLocalMillis()) >= (new LocalTime(8, 59, 0, 0).getLocalMillis())&&(new LocalTime().getLocalMillis()) <= (new LocalTime(16, 59, 0, 0).getLocalMillis())){
+        test = "ON"
+			}
+		}
+	}
+    sendCommand(officetime, test)
+end
+
+
+///////////////////////////////////////////////////////////////////////
+//                               GUI
+///////////////////////////////////////////////////////////////////////
+///TIMER DONT CHANGE
+rule "Show timer Main Light"
+when
+    Item test_integer changed
+then
+    val org.eclipse.xtext.xbase.lib.Functions$Function2 makeTimer = [
+        int myDelay,
+        org.eclipse.xtext.xbase.lib.Functions$Function2 makeTimer2 |
+            if(myDelay>0) {
+                postUpdate(gui_variable,myDelay)
+                myTimer= createTimer(now.plusMinutes(1)) [|
+                    postUpdate(gui_variable,myDelay-1)
+                    makeTimer2.apply(myDelay-1,makeTimer2)
+                ]
+            }else {
+                //timer reach zero
+                postUpdate(test_integer,0)
+            }
+    ]
+
+    if(myTimer!=null) {
+        myTimer.cancel
+        myTimer= null
+        postUpdate(gui_variable,0)
+    }
+
+	  if(test_integer.state==2){
+        //start the timer
+        makeTimer.apply(timeout,makeTimer)
+    }
+
+    if(test_integer.state==3){
+        //start the timer
+        makeTimer.apply(timeout,makeTimer)
+    }
+
+end
+
+rule "Show timer Office Time Lights"
+when
+    Item test_integer1 changed
+then
+    val org.eclipse.xtext.xbase.lib.Functions$Function2 makeTimer1 = [
+        int myDelay1,
+        org.eclipse.xtext.xbase.lib.Functions$Function2 makeTimer12 |
+            if(myDelay1>0) {
+                postUpdate(gui_variable1,myDelay1)
+                myTimer1= createTimer(now.plusMinutes(1)) [|
+                    postUpdate(gui_variable1,myDelay1-1)
+                    makeTimer12.apply(myDelay1-1,makeTimer12)
+                ]
+            }else {
+                //timer reach zero
+                postUpdate(test_integer1,0)
+            }
+    ]
+
+    if(myTimer1!=null) {
+        myTimer1.cancel
+        myTimer1= null
+        postUpdate(gui_variable1,0)
+    }
+
+	if(test_integer1.state==2){
+        //start the timer
+        makeTimer1.apply(timeout1,makeTimer1)
+    }
+
+    if(test_integer1.state==3){
+        //start the timer
+        makeTimer1.apply(timeout1,makeTimer1)
+    }
+
+end

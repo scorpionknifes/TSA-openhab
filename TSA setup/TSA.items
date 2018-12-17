@@ -1,0 +1,58 @@
+///////////////////////////////////////////////////////////////////////
+//                               Main
+///////////////////////////////////////////////////////////////////////
+
+//Timer For GUI
+Number test_integer "Timer"
+Number gui_variable "Minutes remaining"
+Number test_integer1 "Office Hour Timer"
+Number gui_variable1 "Minutes remaining"
+
+//Variables
+Switch Holiday "is Holiday"			//current Holiday
+Switch officetime "is Office Hour"	//current office time
+
+//Main Lights
+Switch wx "Lights" <light> [ "Lighting" ]			//All Main Lights
+Switch w0x "Business Hour" <light> [ "Lighting" ]	//All Office Time Lights
+
+
+///////////////////////////////////////////////////////////////////////
+//                               Light
+///////////////////////////////////////////////////////////////////////
+
+//Office Lights
+Switch w1 "Hallway" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node2:switch_binary" }
+Switch w2 "Taft's Walkway" <light> [ "Lighting" ] //{channel="zwave:device:f0437675:node4:switch_binary" }   //Switch Hardware is Broken
+Switch w3 "Kitchen Door" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node5:switch_binary2" }
+Switch workbench "Work Bench" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node5:switch_binary1" }
+//Office Time Lights
+Switch w01 "Wei's office door w01" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node10:switch_binary" }
+Switch w02 "Hallway w02" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node16:switch_binary" }
+Switch w03 "Warehouse w03 & w04" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node9:switch_binary" }
+Switch w05 "Entrance w05" <light> [ "Lighting" ] {channel="zwave:device:f0437675:node11:switch_binary" }
+//Power watt sensor
+Number w1_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node2:meter_watts"}
+Number w2_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node16:meter_watts"}
+Number w3_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node5:meter_watts"}
+Number w4_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node9:meter_watts"}
+Number w5_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node11:meter_watts"}
+Number w6_watt "Light 1 watt" <power> {channel="zwave:device:f0437675:node10:meter_watts"}
+
+
+///////////////////////////////////////////////////////////////////////
+//                               Sensors
+///////////////////////////////////////////////////////////////////////
+//Motion 1
+Contact Motion_1 "Motion 1 [%s]" <door> {channel="zwave:device:f0437675:node7:sensor_binary" }
+Number Motion_1_battery " Motion 1 [%d]" <battery> (Group_Netatmo,Group_Battery) {channel="zwave:device:f0437675:node7:battery-level"}
+Switch Motion_1_alarm "Motion 1 " {channel="zwave:device:f0437675:node7:alarm_burglar" }
+//Motion 2
+Contact Motion_2 "Motion 2 [%s]" <door> {channel="zwave:device:f0437675:node8:sensor_binary" }
+Number Motion_2_battery " Motion 2 [%d]" <battery> (Group_Netatmo,Group_Battery) {channel="zwave:device:f0437675:node8:battery-level"}
+Switch Motion_2_alarm "Motion 2 " {channel="zwave:device:f0437675:node8:alarm_burglar" }
+//Workbench
+Contact Motion_work_bench "Motion Workbench [%s]" <door> {channel="zwave:device:f0437675:node13:sensor_binary" }
+Number Motion_work_bench_battery " Motion Workbench [%d]" <battery> (Group_Netatmo,Group_Battery) {channel="zwave:device:f0437675:node13:battery-level"}
+Switch Motion_work_bench_alarm "Motion Workbench " {channel="zwave:device:f0437675:node13:alarm_burglar" }
+

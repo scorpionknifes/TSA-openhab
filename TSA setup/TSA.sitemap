@@ -1,0 +1,47 @@
+///////////////////////////////////////////////////////////////////////
+//                               Sitemaps
+///////////////////////////////////////////////////////////////////////
+
+sitemap TSA label="TSA's home automation" {
+
+	Frame label="Main Switch" {
+		Switch item=Holiday
+		Switch item=officetime
+		Switch item=wx
+		Switch item=w0x
+	}
+	Frame label="Switch" {
+		Switch item=w1 icon="light"				//Switch
+		Text item=w1_watt label="Power [%d KW]"		//gives reading in 100
+		Switch item=w2 icon="light"
+		Text item=w2_watt label="Power [%d KW]"
+		Switch item=w3 icon="light"
+		Text item=w3_watt label="Power [%d KW]"
+		Switch item=workbench icon="light"
+		Text item=w3_watt label="Power [%d KW]"
+		Switch item=w01 icon="light"
+		Text item=w4_watt label="Power [%d KW]"
+		Switch item=w02 icon="light"
+		Text item=w2_watt label="Power [%d KW]"
+		Switch item=w03 icon="light"
+		Text item=w6_watt label="Power [%d KW]"
+		Switch item=w05 icon="light"
+		Text item=w6_watt label="Power [%d KW]"
+	}
+	
+	//Sensors
+	Frame label="Sensor" {
+		Switch item=Motion_1_alarm icon="motion"				//switches on with motion is detected
+		Switch item=Motion_2_alarm icon="motion"				//switches on with motion is detected
+		Switch item=Motion_work_bench_alarm icon="motion"
+		Selection item=test_integer mappings=[0="Light Off",2="Motion 1",3="Motion 2"]
+		Text item=gui_variable icon="timer" visibility=[gui_variable>0] label="Minutes remaining [%d]"
+		Selection item=test_integer1 mappings=[0="Light Off",2="Motion 1",3="Motion 2"]
+		Text item=gui_variable1 icon="timer" visibility=[gui_variable1>0] label="Minutes remaining [%d]"
+	}
+
+	Frame label="Battery" {
+		Text item=Motion_1_battery label="Motion 1 [%d]"		//gives reading in 100
+		Text item=Motion_2_battery label="Motion 2 [%d]"		//gives reading in 100
+	}
+}
